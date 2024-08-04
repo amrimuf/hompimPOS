@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from './company.entity';
@@ -12,9 +12,17 @@ export class CompanyService {
     private readonly companyRepository: Repository<Company>,
   ) {}
 
+  private readonly logger = new Logger(CompanyService.name);
+
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    const company = this.companyRepository.create(createCompanyDto);
-    return this.companyRepository.save(company);
+    this.logger.log('Creating a new company');
+    try {
+      const company = this.companyRepository.create(createCompanyDto);
+      return await this.companyRepository.save(company);
+    } catch (error) {
+      this.logger.error('Failed to create company', error.stack);
+      throw error;
+    }
   }
 
   async findAll(): Promise<Company[]> {

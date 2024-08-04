@@ -108,7 +108,7 @@ describe('CompanyController', () => {
         address: '123 Test St',
         phone: '123-456-7890',
         email: 'test@example.com',
-        stores: [], // Mocked stores property
+        stores: [],
       };
 
       jest.spyOn(service, 'update').mockResolvedValue(updatedCompany);
