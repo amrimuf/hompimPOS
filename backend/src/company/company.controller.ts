@@ -6,12 +6,21 @@ import {
   Param,
   Put,
   Delete,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './company.entity';
+import { BulkDeleteDto } from './dto/delete-company.dto';
 
 @ApiTags('companies')
 @Controller('companies')
@@ -71,7 +80,20 @@ export class CompanyController {
     return this.companyService.update(id, updateCompanyDto);
   }
 
+  @Delete('bulk')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Bulk delete companies' })
+  @ApiBody({
+    description: 'Array of company IDs to be deleted',
+    type: BulkDeleteDto,
+  })
+  @ApiResponse({ status: 204, description: 'Companies successfully deleted' })
+  async removeBulk(@Body() bulkDeleteDto: BulkDeleteDto): Promise<void> {
+    await this.companyService.removeBulk(bulkDeleteDto.ids);
+  }
+
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a company by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'ID of the company' })
   @ApiResponse({

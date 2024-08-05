@@ -1,11 +1,13 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CompanyModule } from './company/company.module';
 import { databaseConfig } from './database.config';
 import { StoreModule } from './store/store.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 @Module({
   imports: [
@@ -31,7 +33,14 @@ import { APP_GUARD } from '@nestjs/core';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-    Logger,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule {}
