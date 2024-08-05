@@ -4,6 +4,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CompanyService } from './company.service';
 import { Company } from './company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CompanyService', () => {
   let service: CompanyService;
@@ -50,6 +52,20 @@ describe('CompanyService', () => {
 
       expect(await service.create(createCompanyDto)).toEqual(savedCompany);
     });
+
+    it('should throw an error if company creation fails', async () => {
+      const createCompanyDto: CreateCompanyDto = {
+        name: 'Test Company',
+        address: '123 Test St',
+        phone: '123-456-7890',
+        email: 'test@example.com',
+      };
+      const error = new Error('Failed to create company');
+
+      jest.spyOn(repository, 'save').mockRejectedValue(error);
+
+      await expect(service.create(createCompanyDto)).rejects.toThrow(error);
+    });
   });
 
   describe('findAll', () => {
@@ -66,6 +82,13 @@ describe('CompanyService', () => {
       jest.spyOn(repository, 'find').mockResolvedValue(companies as any);
 
       expect(await service.findAll()).toEqual(companies);
+    });
+
+    it('should throw an error if fetching companies fails', async () => {
+      const error = new Error('Failed to fetch companies');
+      jest.spyOn(repository, 'find').mockRejectedValue(error);
+
+      await expect(service.findAll()).rejects.toThrow(error);
     });
   });
 
@@ -86,15 +109,20 @@ describe('CompanyService', () => {
     it('should throw an error if company is not found', async () => {
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(null);
 
-      await expect(service.findOne(1)).rejects.toThrow(
-        'Company with ID 1 not found',
-      );
+      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw an error if fetching a company fails', async () => {
+      const error = new Error('Failed to fetch company');
+      jest.spyOn(repository, 'findOneBy').mockRejectedValue(error);
+
+      await expect(service.findOne(1)).rejects.toThrow(error);
     });
   });
 
   describe('update', () => {
     it('should update a company and return the updated company', async () => {
-      const updateCompanyDto = { name: 'Updated Company' };
+      const updateCompanyDto: UpdateCompanyDto = { name: 'Updated Company' };
       const updateResult: UpdateResult = {
         raw: [],
         affected: 1,
@@ -118,6 +146,15 @@ describe('CompanyService', () => {
         email: 'test@example.com',
       });
     });
+
+    it('should throw an error if company update fails', async () => {
+      const updateCompanyDto: UpdateCompanyDto = { name: 'Updated Company' };
+      const error = new Error('Failed to update company');
+
+      jest.spyOn(repository, 'update').mockRejectedValue(error);
+
+      await expect(service.update(1, updateCompanyDto)).rejects.toThrow(error);
+    });
   });
 
   describe('remove', () => {
@@ -127,6 +164,50 @@ describe('CompanyService', () => {
         .mockResolvedValue({ affected: 1 } as any);
 
       await expect(service.remove(1)).resolves.not.toThrow();
+    });
+
+    it('should throw an error if company is not found for deletion', async () => {
+      jest
+        .spyOn(repository, 'delete')
+        .mockResolvedValue({ affected: 0 } as any);
+
+      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw an error if company deletion fails', async () => {
+      const error = new Error('Failed to delete company');
+      jest.spyOn(repository, 'delete').mockRejectedValue(error);
+
+      await expect(service.remove(1)).rejects.toThrow(error);
+    });
+  });
+
+  describe('removeBulk', () => {
+    it('should delete multiple companies', async () => {
+      const ids = [1, 2, 3];
+      jest
+        .spyOn(repository, 'delete')
+        .mockResolvedValue({ affected: ids.length } as any);
+
+      await expect(service.removeBulk(ids)).resolves.not.toThrow();
+    });
+
+    it('should handle empty id list gracefully', async () => {
+      const ids: number[] = [];
+      jest
+        .spyOn(repository, 'delete')
+        .mockResolvedValue({ affected: 0 } as any);
+
+      await expect(service.removeBulk(ids)).resolves.not.toThrow();
+    });
+
+    it('should throw an error if deletion fails', async () => {
+      const ids = [1, 2, 3];
+      const error = new Error('Failed to delete companies');
+
+      jest.spyOn(repository, 'delete').mockRejectedValue(error);
+
+      await expect(service.removeBulk(ids)).rejects.toThrow(error);
     });
   });
 });

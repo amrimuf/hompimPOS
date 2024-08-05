@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Company } from './company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -95,11 +95,23 @@ export class CompanyService {
       `Attempting to delete companies with IDs: ${ids.join(', ')}`,
     );
 
+    if (ids.length === 0) {
+      this.logger.warn('No IDs provided for bulk deletion');
+      return;
+    }
+
     try {
-      await this.companyRepository.delete({ companyID: In(ids) });
-      this.logger.log(
-        `Successfully deleted companies with IDs: ${ids.join(', ')}`,
-      );
+      const result = await this.companyRepository.delete(ids);
+
+      if (result.affected !== ids.length) {
+        this.logger.warn(
+          `Some companies with IDs ${ids.join(', ')} were not found for deletion`,
+        );
+      } else {
+        this.logger.log(
+          `Successfully deleted companies with IDs: ${ids.join(', ')}`,
+        );
+      }
     } catch (error) {
       this.logger.error('Failed to delete companies', error.stack);
       throw error;
