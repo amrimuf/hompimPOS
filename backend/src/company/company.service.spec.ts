@@ -5,11 +5,12 @@ import { CompanyService } from './company.service';
 import { Company } from './company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 
 describe('CompanyService', () => {
   let service: CompanyService;
   let repository: Repository<Company>;
+  let logger: Logger;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,11 +27,16 @@ describe('CompanyService', () => {
             create: jest.fn(),
           },
         },
+        Logger,
       ],
     }).compile();
 
     service = module.get<CompanyService>(CompanyService);
     repository = module.get<Repository<Company>>(getRepositoryToken(Company));
+    logger = module.get<Logger>(Logger);
+
+    jest.spyOn(logger, 'log').mockImplementation(() => {});
+    jest.spyOn(logger, 'error').mockImplementation(() => {});
   });
 
   it('should be defined', () => {
@@ -38,7 +44,7 @@ describe('CompanyService', () => {
   });
 
   describe('create', () => {
-    it('should create a new company', async () => {
+    it('should create a new company and log the process', async () => {
       const createCompanyDto: CreateCompanyDto = {
         name: 'Test Company',
         address: '123 Test St',
@@ -50,10 +56,19 @@ describe('CompanyService', () => {
       jest.spyOn(repository, 'create').mockReturnValue(savedCompany as any);
       jest.spyOn(repository, 'save').mockResolvedValue(savedCompany as any);
 
-      expect(await service.create(createCompanyDto)).toEqual(savedCompany);
+      await expect(service.create(createCompanyDto)).resolves.toEqual(
+        savedCompany,
+      );
+      expect(logger.log).toHaveBeenCalledWith(
+        'Creating a new company',
+        JSON.stringify(createCompanyDto),
+      );
+      expect(logger.log).toHaveBeenCalledWith(
+        `Successfully created company with ID ${savedCompany.companyID}`,
+      );
     });
 
-    it('should throw an error if company creation fails', async () => {
+    it('should log an error if company creation fails', async () => {
       const createCompanyDto: CreateCompanyDto = {
         name: 'Test Company',
         address: '123 Test St',
@@ -65,6 +80,10 @@ describe('CompanyService', () => {
       jest.spyOn(repository, 'save').mockRejectedValue(error);
 
       await expect(service.create(createCompanyDto)).rejects.toThrow(error);
+      expect(logger.error).toHaveBeenCalledWith(
+        'Failed to create company',
+        error.stack,
+      );
     });
   });
 

@@ -7,11 +7,10 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Injectable()
 export class CompanyService {
-  private readonly logger = new Logger(CompanyService.name);
-
   constructor(
     @InjectRepository(Company)
     private readonly companyRepository: Repository<Company>,
+    private readonly logger: Logger,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
