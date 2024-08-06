@@ -26,6 +26,7 @@ describe('CompanyController', () => {
   });
 
   describe('create', () => {
+    // success
     it('should create a new company', async () => {
       const createCompanyDto: CreateCompanyDto = {
         name: 'New Company',
@@ -48,6 +49,7 @@ describe('CompanyController', () => {
       );
     });
 
+    // error handling
     it('should handle creation failures', async () => {
       const createCompanyDto: CreateCompanyDto = {
         name: 'New Company',
@@ -64,6 +66,33 @@ describe('CompanyController', () => {
 
       await expect(controller.create(createCompanyDto)).rejects.toThrow(
         HttpException,
+      );
+    });
+
+    // name validation
+    it('should return validation errors if name is not provided', async () => {
+      const createCompanyDto: Partial<CreateCompanyDto> = {
+        email: 'test@example.com',
+        address: '123 Test St',
+      };
+
+      const errorResponse = {
+        statusCode: HttpStatus.BAD_REQUEST,
+        timestamp: expect.any(String),
+        path: '/companies',
+        message: ['name should not be empty', 'name must be a string'],
+      };
+
+      jest
+        .spyOn(service, 'create')
+        .mockRejectedValueOnce(
+          new HttpException(errorResponse, HttpStatus.BAD_REQUEST),
+        );
+
+      await expect(
+        controller.create(createCompanyDto as CreateCompanyDto),
+      ).rejects.toThrow(
+        new HttpException(errorResponse, HttpStatus.BAD_REQUEST),
       );
     });
   });
