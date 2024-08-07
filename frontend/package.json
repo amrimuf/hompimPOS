@@ -30,7 +30,7 @@
 		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
-		"prepare": "husky",
+		"prepare": "cd .. && husky frontend/.husky",
 		"configure-husky": "echo yarn lint-staged > .husky/pre-commit"
 	},
 	"lint-staged": {
