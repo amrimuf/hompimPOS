@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "HompimPOS",
+  "name": "Hompim Point-of-Sale system",
   "icons": [
     {
       "src": "favicon.ico",
