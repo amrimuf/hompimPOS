@@ -20,7 +20,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(6) // Minimum length
+  @MinLength(6)
   @Matches(/(?=.*[a-z])/, {
     message: 'Password must contain at least one lowercase letter',
   })
@@ -39,5 +39,5 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  storeID?: number;
+  storeId?: number;
 }

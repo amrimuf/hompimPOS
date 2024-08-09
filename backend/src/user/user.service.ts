@@ -16,11 +16,9 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { storeID, name, email, password, role } = createUserDto;
+    const { storeId, name, email, password, role } = createUserDto;
 
-    const existingUser = await this.userRepository.findOne({
-      where: { email },
-    });
+    const existingUser = await this.findOne(email);
     if (existingUser) {
       throw new ConflictException('Email already in use');
     }
@@ -29,9 +27,9 @@ export class UserService {
 
     let store: Store | undefined;
 
-    if (storeID) {
+    if (storeId) {
       const foundStore = await this.storeRepository.findOne({
-        where: { storeID },
+        where: { storeId },
       });
       store = foundStore ?? undefined;
     }
@@ -55,7 +53,7 @@ export class UserService {
     });
     return user ?? undefined;
   }
-  async validateUser(email: string, pass: string): Promise<any> {
+  async validateUser(email: string, pass: string): Promise<User | null> {
     const user = await this.findOne(email);
     if (user && (await bcrypt.compare(pass, user.password))) {
       return user;

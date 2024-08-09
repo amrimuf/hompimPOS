@@ -9,6 +9,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Public } from './public.decorator';
+import { LoginUserDto } from './dto/login.dto';
 
 @Controller('auth')
 @Public()
@@ -17,7 +18,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginUserDto: { email: string; password: string }) {
+  async login(@Body() loginUserDto: LoginUserDto) {
     const user = await this.authService.validateUser(
       loginUserDto.email,
       loginUserDto.password,

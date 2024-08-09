@@ -26,8 +26,8 @@ export class RolesGuard implements CanActivate {
 
     if (
       !user ||
-      !user.roles ||
-      !requiredRoles.some((role) => user.roles.includes(role))
+      !user.role ||
+      !requiredRoles.some((role) => user.role.includes(role))
     ) {
       throw new ForbiddenException('You do not have the required role');
     }

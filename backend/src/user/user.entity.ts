@@ -1,11 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Store } from '../store/store.entity';
 import { Role } from '../auth/role.enum';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  userId: number;
+  @PrimaryColumn('uuid')
+  userId: string = uuidv4();
 
   @ManyToOne(() => Store, (store) => store.users, { nullable: true })
   store?: Store;
