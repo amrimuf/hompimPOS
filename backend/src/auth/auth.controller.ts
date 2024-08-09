@@ -11,12 +11,12 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Public } from './public.decorator';
 
 @Controller('auth')
+@Public()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @Public()
   async login(@Body() loginUserDto: { email: string; password: string }) {
     const user = await this.authService.validateUser(
       loginUserDto.email,
@@ -30,7 +30,6 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  @Public()
   async register(@Body() registerUserDto: CreateUserDto) {
     return this.authService.register(registerUserDto);
   }
