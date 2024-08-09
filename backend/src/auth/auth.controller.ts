@@ -5,6 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   HttpException,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -33,5 +35,12 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerUserDto: CreateUserDto) {
     return this.authService.register(registerUserDto);
+  }
+
+  @Get('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmail(@Query('token') token: string) {
+    await this.authService.verifyEmail(token);
+    return { message: 'Email verified successfully' };
   }
 }

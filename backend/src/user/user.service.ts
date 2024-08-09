@@ -44,6 +44,13 @@ export class UserService {
 
     return this.userRepository.save(user);
   }
+  async save(user: User): Promise<User> {
+    return this.userRepository.save(user);
+  }
+
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { verificationToken: token } });
+  }
 
   // does user exist?
   async findOne(email: string): Promise<User | undefined> {
