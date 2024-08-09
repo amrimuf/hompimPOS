@@ -21,6 +21,8 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './company.entity';
 import { BulkDeleteDto } from './dto/delete-company.dto';
+import { Role } from 'src/auth/role.enum';
+import { Roles } from 'src/auth/roles.decorator';
 
 @ApiTags('companies')
 @Controller('companies')
@@ -28,6 +30,7 @@ export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Create a new company' })
   @ApiResponse({
     status: 201,
@@ -40,6 +43,7 @@ export class CompanyController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Get all companies' })
   @ApiResponse({
     status: 200,
