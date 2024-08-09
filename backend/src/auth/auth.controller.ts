@@ -28,6 +28,9 @@ export class AuthController {
     if (!user) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
+    if (!user.isVerified) {
+      throw new HttpException('User is not verified', HttpStatus.FORBIDDEN);
+    }
     return this.authService.login(user);
   }
 
