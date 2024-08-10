@@ -17,6 +17,8 @@ async function bootstrap() {
     .setTitle('HompimPOS API')
     .setDescription('The HompimPOS API documentation')
     .setVersion('1.0')
+    .addTag('Authentication')
+    .addTag('Companies')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

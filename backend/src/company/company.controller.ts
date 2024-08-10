@@ -24,7 +24,7 @@ import { BulkDeleteDto } from './dto/delete-company.dto';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
 
-@ApiTags('companies')
+@ApiTags('Companies')
 @Controller('companies')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
