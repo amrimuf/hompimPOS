@@ -7,9 +7,12 @@ import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { ConfigModule } from '@nestjs/config';
 import { EmailService } from './email.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshToken } from './refresh-token.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([RefreshToken]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
