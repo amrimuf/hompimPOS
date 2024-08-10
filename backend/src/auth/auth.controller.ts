@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Public } from './public.decorator';
 import { LoginUserDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';

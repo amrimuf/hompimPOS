@@ -21,8 +21,8 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './company.entity';
 import { BulkDeleteDto } from './dto/delete-company.dto';
-import { Role } from 'src/auth/role.enum';
-import { Roles } from 'src/auth/roles.decorator';
+import { Role } from '../auth/role.enum';
+import { Roles } from '../auth/roles.decorator';
 
 @ApiTags('Companies')
 @Controller('companies')
