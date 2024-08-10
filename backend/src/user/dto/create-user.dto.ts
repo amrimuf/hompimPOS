@@ -59,7 +59,7 @@ export class CreateUserDto {
   @IsString()
   @ApiPropertyOptional({
     description: 'The store ID associated with the user, if applicable',
-    example: 123,
+    example: '123',
   })
-  storeId?: number;
+  storeId?: string;
 }

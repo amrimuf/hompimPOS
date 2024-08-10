@@ -8,6 +8,8 @@ import { EmailService } from './email.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
 import { Repository } from 'typeorm';
+import { UserResponseDto } from 'src/user/dto/user-response.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +35,7 @@ export class AuthService {
     };
   }
 
-  async register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.userService.create(createUserDto);
 
     const verificationToken = uuidv4();
@@ -44,7 +46,8 @@ export class AuthService {
       user.email,
       verificationToken,
     );
-    return user;
+
+    return plainToClass(UserResponseDto, user);
   }
 
   async verifyEmail(token: string): Promise<void> {

@@ -85,6 +85,7 @@ export class AuthController {
     await this.authService.verifyEmail(token);
     return { message: 'Email verified successfully' };
   }
+
   @Post('refresh-token')
   @ApiOperation({ summary: 'Refresh access token using refresh token' })
   @ApiBody({ type: RefreshTokenDto })

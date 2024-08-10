@@ -1,7 +1,8 @@
-import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn, OneToMany } from 'typeorm';
 import { Store } from '../store/store.entity';
 import { Role } from '../auth/role.enum';
 import { v4 as uuidv4 } from 'uuid';
+import { RefreshToken } from '../auth/refresh-token.entity';
 
 @Entity()
 export class User {
@@ -32,4 +33,7 @@ export class User {
     default: Role.STAFF,
   })
   role: Role;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
 }

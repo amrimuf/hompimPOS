@@ -11,7 +11,7 @@ import { User } from '../user/user.entity';
 @Entity()
 export class Store {
   @PrimaryGeneratedColumn()
-  storeId: number;
+  storeId: string;
 
   @Column()
   name: string;
