@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
+import { AuthService } from './services/auth.service';
+import { JsonWebTokenStrategy } from './jwt.strategy';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { ConfigModule } from '@nestjs/config';
-import { EmailService } from './email.service';
+import { EmailService } from './services/email.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
 
@@ -23,7 +23,7 @@ import { RefreshToken } from './refresh-token.entity';
     }),
     UserModule,
   ],
-  providers: [AuthService, JwtStrategy, EmailService],
+  providers: [AuthService, JsonWebTokenStrategy, EmailService],
   controllers: [AuthController],
   exports: [AuthService],
 })

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { RefreshToken } from './refresh-token.entity';
+import { RefreshToken } from '../refresh-token.entity';
 import { LessThan, Repository } from 'typeorm';
 
 @Injectable()

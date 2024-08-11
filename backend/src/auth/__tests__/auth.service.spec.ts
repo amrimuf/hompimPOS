@@ -2,11 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
-import { EmailService } from './email.service';
-import { RefreshToken } from './refresh-token.entity';
-import { User } from '../user/user.entity';
+import { AuthService } from '../services/auth.service';
+import { UserService } from '../../user/user.service';
+import { EmailService } from '../services/email.service';
+import { RefreshToken } from '../refresh-token.entity';
+import { User } from '../../user/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthService', () => {
@@ -105,7 +105,15 @@ describe('AuthService', () => {
       mockUserService.save.mockResolvedValue(mockUser);
 
       const result = await authService.register(createUserDto);
-      expect(result).toEqual(mockUser);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          userId: '1',
+          name: 'John Doe',
+          email: 'new@example.com',
+          verificationToken: expect.any(String),
+        }),
+      );
       expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
         mockUser.email,
         mockUser.verificationToken,

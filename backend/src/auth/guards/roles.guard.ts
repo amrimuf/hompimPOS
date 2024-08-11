@@ -5,8 +5,9 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from './roles.decorator';
-import { Role } from './role.enum';
+import { ROLES_KEY } from '../decorators/roles.decorator';
+
+import { Role } from '../role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -24,11 +25,7 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (
-      !user ||
-      !user.role ||
-      !requiredRoles.some((role) => user.role.includes(role))
-    ) {
+    if (!user || !user.role || !requiredRoles.includes(user.role)) {
       throw new ForbiddenException('You do not have the required role');
     }
 

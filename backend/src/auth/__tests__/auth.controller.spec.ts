@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { LoginUserDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { AuthController } from '../auth.controller';
+import { AuthService } from '../services/auth.service';
+import { CreateUserDto } from '../../user/dto/create-user.dto';
+import { LoginUserDto } from '../dto/login.dto';
+import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { HttpException } from '@nestjs/common';
-import { User } from '../user/user.entity';
+import { User } from '../../user/user.entity';
 
 describe('AuthController', () => {
   let authController: AuthController;

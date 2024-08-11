@@ -61,10 +61,14 @@ export class UserService {
     return user ?? undefined;
   }
   async validateUser(email: string, pass: string): Promise<User | null> {
-    const user = await this.findOne(email);
-    if (user && (await bcrypt.compare(pass, user.password))) {
-      return user;
+    try {
+      const user = await this.findOne(email);
+      if (user && (await bcrypt.compare(pass, user.password))) {
+        return user;
+      }
+      return null;
+    } catch (error) {
+      throw new Error('User validation failed');
     }
-    return null;
   }
 }

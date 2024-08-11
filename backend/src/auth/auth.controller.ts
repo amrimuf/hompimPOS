@@ -8,9 +8,9 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { Public } from './public.decorator';
+import { Public } from './decorators/public.decorator';
 import { LoginUserDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import {
@@ -44,17 +44,26 @@ export class AuthController {
     description: 'User is not verified',
   })
   async login(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.authService.validateUser(
-      loginUserDto.email,
-      loginUserDto.password,
-    );
-    if (!user) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    try {
+      const user = await this.authService.validateUser(
+        loginUserDto.email,
+        loginUserDto.password,
+      );
+
+      if (!user) {
+        throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      }
+      if (!user.isVerified) {
+        throw new HttpException('User is not verified', HttpStatus.FORBIDDEN);
+      }
+
+      return this.authService.login(user);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (!user.isVerified) {
-      throw new HttpException('User is not verified', HttpStatus.FORBIDDEN);
-    }
-    return this.authService.login(user);
   }
 
   @Post('register')

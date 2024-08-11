@@ -22,7 +22,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './company.entity';
 import { BulkDeleteDto } from './dto/delete-company.dto';
 import { Role } from '../auth/role.enum';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('Companies')
 @Controller('companies')
@@ -43,7 +43,7 @@ export class CompanyController {
   }
 
   @Get()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({ summary: 'Get all companies' })
   @ApiResponse({
     status: 200,

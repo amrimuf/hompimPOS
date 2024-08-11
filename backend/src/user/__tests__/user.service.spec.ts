@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
-import { UserService } from './user.service';
-import { User } from './user.entity';
-import { Store } from '../store/store.entity';
+import { UserService } from '../user.service';
+import { User } from '../user.entity';
+import { Store } from '../../store/store.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { ConflictException } from '@nestjs/common';
-import { Role } from '../auth/role.enum';
+import { Role } from '../../auth/role.enum';
 
 jest.mock('bcryptjs');
 
@@ -24,7 +24,9 @@ describe('UserService', () => {
           useValue: {
             create: jest.fn().mockResolvedValue({}),
             save: jest.fn().mockResolvedValue({}),
-            findOne: jest.fn().mockResolvedValue(null),
+            findOne: jest.fn().mockImplementation(async () => {
+              throw new Error('Database error');
+            }),
           },
         },
         {
@@ -131,6 +133,16 @@ describe('UserService', () => {
         'wrongPassword',
       );
       expect(result).toBeNull();
+    });
+
+    it('should throw an error if findOne fails', async () => {
+      jest
+        .spyOn(userRepository, 'findOne')
+        .mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        service.validateUser('test@example.com', 'password'),
+      ).rejects.toThrow('User validation failed');
     });
   });
 });

@@ -1,14 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UserService } from '../../user/user.service';
+import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { User } from 'src/user/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { EmailService } from './email.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RefreshToken } from './refresh-token.entity';
+import { RefreshToken } from '../refresh-token.entity';
 import { Repository } from 'typeorm';
-import { UserResponseDto } from 'src/user/dto/user-response.dto';
+import { UserResponseDto } from '../../user/dto/user-response.dto';
 import { plainToClass } from 'class-transformer';
 
 @Injectable()
@@ -22,7 +22,11 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User | null> {
-    return this.userService.validateUser(email, pass);
+    try {
+      return await this.userService.validateUser(email, pass);
+    } catch (error) {
+      throw new Error('Authentication failed');
+    }
   }
 
   async login(user: User) {

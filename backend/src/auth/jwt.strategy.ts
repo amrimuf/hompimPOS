@@ -5,7 +5,10 @@ import { UserService } from 'src/user/user.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JsonWebTokenStrategy extends PassportStrategy(
+  Strategy,
+  'jsonwebtoken',
+) {
   constructor(private userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -21,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     return {
-      userID: payload.sub,
+      userId: payload.sub,
       email: payload.email,
       role: user.role,
       isVerified: user.isVerified,

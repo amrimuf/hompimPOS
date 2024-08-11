@@ -10,9 +10,9 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { RolesGuard } from './auth/roles.guard';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { VerifiedGuard } from './auth/verified.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { VerifiedGuard } from './auth/guards/verified.guard';
 
 @Module({
   imports: [
