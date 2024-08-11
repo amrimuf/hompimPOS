@@ -1,8 +1,8 @@
-import { CompanyController } from './company.controller';
-import { CompanyService } from './company.service';
-import { CreateCompanyDto } from './dto/create-company.dto';
-import { UpdateCompanyDto } from './dto/update-company.dto';
-import { Company } from './company.entity';
+import { CompanyController } from '../company.controller';
+import { CompanyService } from '../company.service';
+import { CreateCompanyDto } from '../dto/create-company.dto';
+import { UpdateCompanyDto } from '../dto/update-company.dto';
+import { Company } from '../company.entity';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 describe('CompanyController', () => {

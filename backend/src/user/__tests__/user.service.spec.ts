@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Repository } from 'typeorm';
+// import { Repository } from 'typeorm';
 import { UserService } from '../user.service';
 import { User } from '../user.entity';
 import { Store } from '../../store/store.entity';
@@ -12,8 +12,16 @@ jest.mock('bcryptjs');
 
 describe('UserService', () => {
   let service: UserService;
-  let userRepository: Repository<User>;
-  // let storeRepository: Repository<Store>;
+
+  const mockUserRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    findOne: jest.fn(),
+  };
+
+  const mockStoreRepository = {
+    findOne: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,25 +29,21 @@ describe('UserService', () => {
         UserService,
         {
           provide: getRepositoryToken(User),
-          useValue: {
-            create: jest.fn().mockResolvedValue({}),
-            save: jest.fn().mockResolvedValue({}),
-            findOne: jest.fn().mockImplementation(async () => {
-              throw new Error('Database error');
-            }),
-          },
+          useValue: mockUserRepository,
         },
         {
           provide: getRepositoryToken(Store),
-          useValue: {
-            findOne: jest.fn().mockResolvedValue(undefined),
-          },
+          useValue: mockStoreRepository,
         },
       ],
     }).compile();
 
     service = module.get<UserService>(UserService);
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+
+    // for spyOn()
+    // let userRepository: Repository<User>;
+    // let storeRepository: Repository<Store>;
+    // userRepository = module.get<Repository<User>>(getRepositoryToken(User));
     // storeRepository = module.get<Repository<Store>>(getRepositoryToken(Store));
   });
 
@@ -49,7 +53,7 @@ describe('UserService', () => {
 
   describe('create', () => {
     it('should throw ConflictException if user already exists', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce({} as User);
+      mockUserRepository.findOne.mockResolvedValueOnce({} as User);
 
       await expect(
         service.create({
@@ -63,8 +67,9 @@ describe('UserService', () => {
     });
 
     it('should successfully create a user', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
-      jest.spyOn(userRepository, 'save').mockResolvedValueOnce({} as User);
+      mockUserRepository.findOne.mockResolvedValueOnce(null);
+      mockUserRepository.create.mockReturnValue({} as User);
+      mockUserRepository.save.mockResolvedValueOnce({} as User);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
 
       const user = await service.create({
@@ -82,14 +87,14 @@ describe('UserService', () => {
   describe('findByVerificationToken', () => {
     it('should return user if found', async () => {
       const user = { email: 'john@example.com' } as User;
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(user);
+      mockUserRepository.findOne.mockResolvedValueOnce(user);
 
       const result = await service.findByVerificationToken('token');
       expect(result).toEqual(user);
     });
 
     it('should return null if no user is found', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+      mockUserRepository.findOne.mockResolvedValueOnce(null);
 
       const result = await service.findByVerificationToken('token');
       expect(result).toBeNull();
@@ -99,14 +104,14 @@ describe('UserService', () => {
   describe('findOne', () => {
     it('should return user if found', async () => {
       const user = { email: 'john@example.com' } as User;
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(user);
+      mockUserRepository.findOne.mockResolvedValueOnce(user);
 
       const result = await service.findOne('john@example.com');
       expect(result).toEqual(user);
     });
 
     it('should return undefined if no user is found', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+      mockUserRepository.findOne.mockResolvedValueOnce(null);
 
       const result = await service.findOne('john@example.com');
       expect(result).toBeUndefined();
@@ -116,7 +121,7 @@ describe('UserService', () => {
   describe('validateUser', () => {
     it('should return user if credentials are valid', async () => {
       const user = { password: 'hashedPassword' } as User;
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(user);
+      mockUserRepository.findOne.mockResolvedValueOnce(user);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const result = await service.validateUser('john@example.com', 'password');
@@ -125,7 +130,7 @@ describe('UserService', () => {
 
     it('should return null if credentials are invalid', async () => {
       const user = { password: 'hashedPassword' } as User;
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(user);
+      mockUserRepository.findOne.mockResolvedValueOnce(user);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       const result = await service.validateUser(
@@ -136,9 +141,7 @@ describe('UserService', () => {
     });
 
     it('should throw an error if findOne fails', async () => {
-      jest
-        .spyOn(userRepository, 'findOne')
-        .mockRejectedValue(new Error('Database error'));
+      mockUserRepository.findOne.mockRejectedValue(new Error('Database error'));
 
       await expect(
         service.validateUser('test@example.com', 'password'),

@@ -79,7 +79,6 @@ describe('AuthService', () => {
       const mockUser = { email: 'test@example.com', userId: '1', role: 'user' };
       mockJwtService.sign.mockReturnValueOnce('mockAccessToken');
       mockJwtService.sign.mockReturnValueOnce('mockRefreshToken');
-      mockRefreshTokenRepository.save.mockResolvedValue({});
 
       const result = await authService.login(mockUser as User);
       expect(result).toEqual({
@@ -106,14 +105,10 @@ describe('AuthService', () => {
 
       const result = await authService.register(createUserDto);
 
-      expect(result).toEqual(
-        expect.objectContaining({
-          userId: '1',
-          name: 'John Doe',
-          email: 'new@example.com',
-          verificationToken: expect.any(String),
-        }),
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...expectedUser } = mockUser;
+
+      expect(result).toEqual(expectedUser);
       expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
         mockUser.email,
         mockUser.verificationToken,
@@ -186,10 +181,16 @@ describe('AuthService', () => {
   describe('revokeRefreshToken', () => {
     it('should revoke a refresh token', async () => {
       const token = 'tokenToRevoke';
+      const updateSpy = jest.spyOn(mockRefreshTokenRepository, 'update');
+
       await authService.revokeRefreshToken(token);
-      expect(mockRefreshTokenRepository.update).toHaveBeenCalledWith(
+
+      expect(updateSpy).toHaveBeenCalledWith(
         { token },
-        expect.objectContaining({ revokedAt: expect.any(Date) }),
+        {
+          revokedAt: expect.any(Date),
+          expiresAt: expect.any(Date),
+        },
       );
     });
   });
